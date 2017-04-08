@@ -6,7 +6,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=170eafd687d4a2b950819cd5e067e6d5"
 
 SRCNAME = "wand"
 
-SRC_URI = "git://github.com/dahlia/wand.git;tag=${PV}"
+SRC_URI = "git://github.com/dahlia/wand.git;tag=${PV} \
+           file://0001-Fix-310-TypeError-during-version-parsing.patch"
+
 S = "${WORKDIR}/git"
 
 inherit setuptools

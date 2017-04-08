@@ -1,0 +1,50 @@
+From 30e8ba605b6f77b7ed178678c7029a0b4f454def Mon Sep 17 00:00:00 2001
+From: Hong Minhee <hongminhee@member.fsf.org>
+Date: Sat, 22 Oct 2016 15:24:07 +0900
+Subject: [PATCH] Fix #310 TypeError during version parsing
+
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841548
+---
+ docs/changes.rst | 5 +++++
+ wand/version.py  | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/docs/changes.rst b/docs/changes.rst
+index 6d5550b..5fe4dfe 100644
+--- a/docs/changes.rst
++++ b/docs/changes.rst
+@@ -21,6 +21,11 @@ Released on June 1, 2016.
+   [:issue:`281` by Dan Harrison]
+ - Fixed :exc:`OSError` during import :file:`libc.dylib` due to El Capitan's
+   SIP protection.  [:issue:`275` by Ramesh Dharan]
++- Fixed :exc:`TypeError` during parsing version caused by format change of
++  ImageMagick version string (introduced by 6.9.6.2).
++  [:issue:`310`, `Debian bug report #841548`__]
++
++__ https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=841548
+ 
+ 
+ Version 0.4.2
+diff --git a/wand/version.py b/wand/version.py
+index baf34fa..5a068de 100644
+--- a/wand/version.py
++++ b/wand/version.py
+@@ -101,13 +101,13 @@ if libmagick:
+     #: .. versionadded:: 0.2.1
+     MAGICK_RELEASE_DATE_STRING = text(libmagick.GetMagickReleaseDate())
+ 
++    _match = re.match(r'^(\d{4})-?(\d\d)-?(\d\d)$', MAGICK_RELEASE_DATE_STRING)
+     #: (:class:`basestring`) The date string e.g. ``'2012-06-03'`` of
+     #: :const:`MAGICK_RELEASE_DATE_STRING`.  This value is the exactly same
+     #: string to the result of :c:func:`GetMagickReleaseDate` function.
+     #:
+     #: .. versionadded:: 0.2.1
+-    MAGICK_RELEASE_DATE = datetime.date(
+-        *map(int, MAGICK_RELEASE_DATE_STRING.split('-')))
++    MAGICK_RELEASE_DATE = datetime.date(*map(int, _match.groups()))
+ 
+     c_quantum_depth = ctypes.c_size_t()
+     libmagick.GetMagickQuantumDepth(ctypes.byref(c_quantum_depth))
+-- 
+2.11.0
+
